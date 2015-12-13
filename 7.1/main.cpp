@@ -31,7 +31,7 @@ void CalculateCoordinates(Vector2f(&coordinatePoints)[AMOUNT_POINTS])  {
 	}
 }
 
-void DrawPoints(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS] ) {
+void DrawPoints(RenderWindow &window, std::vector<Vector2f> const& points) {
 	for (int i = 0; i < AMOUNT_POINTS; i++)  {
 		if (i % 15 == 0) {
 			watch.point.setRadius(6);
@@ -74,7 +74,7 @@ void PositionArrows() {
 	watch.centre.setFillColor(Color::Black);
 	watch.centre.setPosition((WINDOW_X / 2) - watch.centre.getRadius(), (WINDOW_Y / 2) - watch.centre.getRadius());
 }
-void DrawHours(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS])
+void DrawHours(RenderWindow &window, std::vector<Vector2f> const& points)
 {
 	window.draw(watch.hourArrow);
 	window.draw(watch.minArrow);
@@ -86,7 +86,7 @@ void DrawHours(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS])
 void TimeIsOn(RenderWindow &window)
 {
 	PositionArrows();
-	Vector2f coordinatePoints[AMOUNT_POINTS];
+	std::vector<Vector2f> const& points;
 	CalculateCoordinates(coordinatePoints);
 	SYSTEMTIME sysTime;
 
