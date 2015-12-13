@@ -22,7 +22,7 @@ struct Shapes {
 	CircleShape point;
 }watch;
 
-void CoordPoints(Vector2f(&coordinatePoints)[AMOUNT_POINTS]) {
+void CalculateCoordinates(Vector2f(&coordinatePoints)[AMOUNT_POINTS])  {
 	Vector2f coordinatePoint;
 	for (int i = 0; i < AMOUNT_POINTS; i++) {
 		coordinatePoint.x = START_X + SCALE * cos(i * 6 * float(M_PI) / 180);
@@ -31,8 +31,8 @@ void CoordPoints(Vector2f(&coordinatePoints)[AMOUNT_POINTS]) {
 	}
 }
 
-void DrawPoints(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS]) {
-	for (int i = 0; i < AMOUNT_POINTS; i++) {
+void DrawPoints(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS] ) {
+	for (int i = 0; i < AMOUNT_POINTS; i++)  {
 		if (i % 15 == 0) {
 			watch.point.setRadius(6);
 			watch.point.setOrigin(6 / 2, 6 / 2);
@@ -48,7 +48,7 @@ void DrawPoints(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS]
 			watch.point.setOrigin(1 / 2, 1 / 2);
 			watch.point.setFillColor(Color::Blue);
 		}
-		watch.point.setPosition(coordinatePoints[i].x, coordinatePoints[i].y);
+		watch.point.setPosition(coordinatePoints[i]);
 		window.draw(watch.point);
 	}
 }
@@ -74,12 +74,20 @@ void PositionArrows() {
 	watch.centre.setFillColor(Color::Black);
 	watch.centre.setPosition((WINDOW_X / 2) - watch.centre.getRadius(), (WINDOW_Y / 2) - watch.centre.getRadius());
 }
+void DrawHours(RenderWindow &window, Vector2f(&coordinatePoints)[AMOUNT_POINTS])
+{
+	window.draw(watch.hourArrow);
+	window.draw(watch.minArrow);
+	window.draw(watch.secArrow);
+	window.draw(watch.centre);
+	DrawPoints(window, coordinatePoints);
+}
 
 void TimeIsOn(RenderWindow &window)
 {
 	PositionArrows();
 	Vector2f coordinatePoints[AMOUNT_POINTS];
-	CoordPoints(coordinatePoints);
+	CalculateCoordinates(coordinatePoints);
 	SYSTEMTIME sysTime;
 
 	while (window.isOpen())
@@ -97,21 +105,16 @@ void TimeIsOn(RenderWindow &window)
 		watch.hourArrow.setRotation(float((sysTime.wHour + 3) * 30 + (sysTime.wMinute * 30 / 60) ));
 
 		window.clear(Color::White);
-		window.draw(watch.hourArrow);
-		window.draw(watch.minArrow);
-		window.draw(watch.secArrow);
-		window.draw(watch.centre);
-		DrawPoints(window, coordinatePoints);
-
+		DrawHours(window, coordinatePoints);
 		window.display();
+		
 	}
 }
-
 int main()
 {
-	RenderWindow window(VideoMode(WINDOW_X, WINDOW_Y), "Clock");
 	ContextSettings settings;
 	settings.antialiasingLevel = 8;
+	RenderWindow window(VideoMode(WINDOW_X, WINDOW_Y), "Clock", sf::Style::Default, settings);
 	TimeIsOn(window);
 	return 0;
 }
