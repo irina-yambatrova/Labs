@@ -56,7 +56,7 @@ def Save_Recources_Url(main_url, url, count, main_dir):
             index = content.find(address)
             extra_content = content[ : index] + './' + image_name + content[index + len(address):]
             content = extra_content
-            extraContent = ''
+            extra_content = ''
             if address.find('http') < 0:
                 address = main_url + address
             if address.find('http') > 0:
