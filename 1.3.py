@@ -1,27 +1,26 @@
-
 import urllib
 import urllib2
 import re
 import os
 
 
-main_Dir = os.getcwd()
-numbPages = 15
-maxLenUrlsList = numbPages * 10
+main_dir = os.getcwd()
+numb_pages = 15 
+max_len_urls_list = numb_pages * 10 
+
 extensions = {'gif', 'bmp', 'jpg', 'jpeg', 'png', 'js', 'css', 'html', 'ico'}
-list1 = {'q', 'w', 'e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','m','n'}
-list2 =  {'1','2','3','4','5','6','7','8','9','0'}
+correct_letters = {'1','2','3','4','5','6','7','8','9','0','q', 'w', 'e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','m','n'}
 
 
-def Right_Address(url, main_Url):
+def Right_Address(url, main_url):
     if url.find('http') < 0:
-        correct_Url = main_Url + url
+        correct_url = main_url + url
     else:
-        correct_Url = url
+        correct_url = url
     if (url.find('@') > 0) or (url.find('#') > 0) or (url =='/rss'):
         return False
     else:
-        return correct_Url
+        return correct_url
 
 def Right_Resources_List(url):
     content = urllib2.urlopen(url).read()
@@ -34,30 +33,32 @@ def Right_Resources_List(url):
     return urls
 
 
-def Save_Recources_Url(main_Url, url, count, main_Dir):
-    k = 1
-    extraContent = ''
-    newDir = main_Dir + '\\' + str(count)
-    os.mkdir(newDir)
-    os.chdir(newDir)
-    content = urllib2.urlopen(Right_Address(url, main_Url)).read()
-    urlsList = Right_Resources_List(Right_Address(url, main_Url))
-    for i in range(len(urlsList)):
-        address = urlsList[i]
+def Save_Recources_Url(main_url, url, count, main_dir):
+    extra_content = ''
+    new_dir = main_dir + '\\' + str(count)
+    os.mkdir(new_dir)
+    os.chdir(new_dir)
+    
+    def Change_Name():
+        if not (image_name[index_entry_letters] in correct_letters)  and (image_name[index_entry_letters] != '.'):
+                    extra_str = image_name[: index_entry_letters] + str(random(correct_letters)) + image_name[index_entry_letters + 1 :]
+                    image_name = extra_str
+                    extra_str = ''
+ 
+    content = urllib2.urlopen(Right_Address(url, main_url)).read()
+    urls_list = Right_Resources_List(Right_Address(url, main_url))
+    for i in range(len(urls_list)):
+        address = urls_list[i]
         if address[address.rfind('.') + 1 : ] in extensions:
             image_name = address[address.rfind('/') + 1 : ]
             for j in range(len(image_name)):
-                if not (image_name[j] in list1) and not (image_name[j] in list2) and (image_name[j] != '.'):
-                    extra_str = image_name[: j] + str(k) + image_name[j + 1 :]
-                    image_name = extra_str
-                    extra_str = ''
-                    k += 1
+                 Change_Name() 
             index = content.find(address)
-            extraContent = content[ : index] + './' + image_name + content[index + len(address):]
-            content = extraContent
+            extra_content = content[ : index] + './' + image_name + content[index + len(address):]
+            content = extra_content
             extraContent = ''
             if address.find('http') < 0:
-                address = main_Url + address
+                address = main_url + address
             if address.find('http') > 0:
                 address = address[address.find('http') : ]
             urllib.urlretrieve(address, image_name)
@@ -66,28 +67,27 @@ def Save_Recources_Url(main_Url, url, count, main_Dir):
     fout.close()
 
 
-savedPages = []
+saved_pages = [] 
 count = 1
-i = 0
-correct_Url = ''
-urlsList = []
-main_Url = 'http://lenta.ru/'
+correct_url = ''
+urls_list = [] 
+main_url = 'http://lenta.ru/'
 word = 'Москва'
-urlsList.append(main_Url)
+urls_list.append(main_url)
 
-while (i < len(urlsList)) and (len(savedPages) <= numbPages):
-    url = urlsList[i]
-    correct_Url = Right_Address(url, main_Url)
-    if (correct_Url == False):
-        urlsList.pop(i)
+while (0 < len(urls_list)) and (len(saved_pages) <= numb_pages):
+    url = urls_list[0]
+    correct_url = Right_Address(url, main_url)
+    if (correct_url == False):
+        urls_list.pop(0)
     else:
-        content = urllib2.urlopen(correct_Url).read()
-        if (content.find(word) > 0) and (correct_Url not in savedPages) and (len(savedPages) <= numbPages):
-            Save_Recources_Url(main_Url, url, count, main_Dir)
-            os.chdir(main_Dir)
+        content = urllib2.urlopen(correct_url).read()
+        if (content.find(word) > 0) and (correct_url not in saved_pages) and (len(saved_pages) <= numb_pages):
+            Save_Recources_Url(main_url, url, count, main_dir)
+            os.chdir(main_dir)
             print count
             count += 1
-            savedPages.append(correct_Url)
-        urlsList += re.findall('a.*?href="(.*?)"',content)
-        urlsList.pop(i)
+            saved_pages.append(correct_url)
+        urls_list += re.findall('a.*?href="(.*?)"',content)
+        urls_list.pop(0)
 print 'END'
