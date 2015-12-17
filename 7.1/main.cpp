@@ -6,13 +6,13 @@
 #include <math.h>
 
 using namespace sf;
-
 const int WINDOW_X = 440;
 const int WINDOW_Y = WINDOW_X;
 const int START_X = WINDOW_X / 2;
 const int START_Y = WINDOW_Y / 2;
 const int AMOUNT_POINTS = 60;
 const int SCALE = 175;
+
 
 struct Shapes {
 	ConvexShape secArrow;
@@ -22,17 +22,17 @@ struct Shapes {
 	CircleShape point;
 }watch;
 
-void CalculateCoordinates(Vector2f(&coordinatePoints)[AMOUNT_POINTS])  {
-	Vector2f coordinatePoint;
+
+void CalculateCoordinates(std::vector<Vector2f> & points) {
+	points.resize(AMOUNT_POINTS);
 	for (int i = 0; i < AMOUNT_POINTS; i++) {
-		coordinatePoint.x = START_X + SCALE * cos(i * 6 * float(M_PI) / 180);
-		coordinatePoint.y = START_Y + SCALE * sin(i * 6 * float(M_PI) / 180);
-		coordinatePoints[i] = { coordinatePoint.x, coordinatePoint.y };
+		points[i].x = START_X + SCALE * cos(i * 6 * float(M_PI) / 180);
+		points[i].y = START_Y + SCALE * sin(i * 6 * float(M_PI) / 180);
 	}
 }
 
 void DrawPoints(RenderWindow &window, std::vector<Vector2f> const& points) {
-	for (int i = 0; i < AMOUNT_POINTS; i++)  {
+	for (int i = 0; i < AMOUNT_POINTS; i++) {
 		if (i % 15 == 0) {
 			watch.point.setRadius(6);
 			watch.point.setOrigin(6 / 2, 6 / 2);
@@ -48,7 +48,7 @@ void DrawPoints(RenderWindow &window, std::vector<Vector2f> const& points) {
 			watch.point.setOrigin(1 / 2, 1 / 2);
 			watch.point.setFillColor(Color::Blue);
 		}
-		watch.point.setPosition(coordinatePoints[i]);
+		watch.point.setPosition(points[i]);
 		window.draw(watch.point);
 	}
 }
@@ -76,20 +76,20 @@ void PositionArrows() {
 }
 void DrawHours(RenderWindow &window, std::vector<Vector2f> const& points)
 {
+	
 	window.draw(watch.hourArrow);
 	window.draw(watch.minArrow);
 	window.draw(watch.secArrow);
 	window.draw(watch.centre);
-	DrawPoints(window, coordinatePoints);
+	DrawPoints(window, points);
 }
 
 void TimeIsOn(RenderWindow &window)
 {
 	PositionArrows();
-	std::vector<Vector2f> const& points;
-	CalculateCoordinates(coordinatePoints);
+	std::vector<Vector2f> points;
+	CalculateCoordinates(points);
 	SYSTEMTIME sysTime;
-
 	while (window.isOpen())
 	{
 		Event event;
@@ -100,14 +100,14 @@ void TimeIsOn(RenderWindow &window)
 		}
 
 		GetSystemTime(&sysTime);
-		watch.secArrow.setRotation(float(sysTime.wSecond * 360 / 60 ));
-		watch.minArrow.setRotation(float(sysTime.wMinute * 360 / 60  + sysTime.wSecond * 6 / 60));
-		watch.hourArrow.setRotation(float((sysTime.wHour + 3) * 30 + (sysTime.wMinute * 30 / 60) ));
+		watch.secArrow.setRotation(float(sysTime.wSecond * 360 / 60));
+		watch.minArrow.setRotation(float(sysTime.wMinute * 360 / 60 + sysTime.wSecond * 6 / 60));
+		watch.hourArrow.setRotation(float((sysTime.wHour + 3) * 30 + (sysTime.wMinute * 30 / 60)));
 
 		window.clear(Color::White);
-		DrawHours(window, coordinatePoints);
+		DrawHours(window, points);
 		window.display();
-		
+
 	}
 }
 int main()
